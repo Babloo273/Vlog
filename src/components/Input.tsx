@@ -22,8 +22,8 @@ export const Input = () => {
        
         try{
            const response=await axios.post(`${BACKEND_URL}/api/v1/user/signup`,postInput)
-           const jwt=response.data;
-           localStorage.setItem("token ",jwt);
+           const jwt=response.data.token;
+           localStorage.setItem("token",jwt);
            navigate("/blogs")
         }catch(e){
 
