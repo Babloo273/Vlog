@@ -21,8 +21,9 @@ export const Signin = () => {
        
         try{
            const response=await axios.post(`${BACKEND_URL}/api/v1/user/signin`,postInput)
-           const jwt=response.data;
-           localStorage.setItem("token ",jwt);
+           const jwt = response.data.jwt; // ✅ extract the string
+          localStorage.setItem("token", jwt); // ✅ saves only the token
+
            navigate("/blogs")
         }catch(e){
 

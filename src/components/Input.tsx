@@ -22,12 +22,14 @@ export const Input = () => {
        
         try{
            const response=await axios.post(`${BACKEND_URL}/api/v1/user/signup`,postInput)
-             console.log("Signup response:", response.data);
-           const jwt=response.data.token;
-           localStorage.setItem("token",jwt);
+           const jwt = response.data.jwt; // ✅ extract the string
+            localStorage.setItem("token", jwt); // ✅ saves only the token
+
+           console.log(jwt)
            navigate("/blogs")
         }catch(e){
-            console.error("Signup error:", e);
+             console.error("Signup failed", e);
+
         }
     }
 

@@ -15,71 +15,37 @@ interface Blogs{
 export const useBlogs = () => {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState<Blogs[]>([]);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-
     const fetchBlogs = async () => {
-      setLoading(true);
-      setError(null);
-
-      const rawToken = localStorage.getItem("token");
-      let jwt = "";
-
-      try {
-        // Handle both plain token or JSON like { jwt: "..." }
-        jwt = rawToken?.startsWith("{")
-          ? JSON.parse(rawToken)?.jwt
-          : rawToken;
-      } catch (e) {
-        console.error("Failed to parse token:", e);
-        // setError("Invalid token");
-        setLoading(false);
-        return;
-      }
-
-      if (!jwt) {
-        // setError("Token not found");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Token missing. Please login.");
         setLoading(false);
         return;
       }
 
       try {
-        const response = await axios.get(
-          `${BACKEND_URL}/api/v1/blog/bulk/`,
-          {
-            headers: {
-              Authorization: `Bearer ${jwt}`,
-            },
-          }
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/v1/blog/bulk/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        if (isMounted) {
-          setBlogs(response.data || []);
-          setLoading(false);
-        }
+        setBlogs(response.data || []);
       } catch (err) {
         console.error("Error fetching blogs:", err);
-        if (isMounted) {
-        //   setError("Failed to fetch blogs");
-          setLoading(false);
-        }
+        setError("Failed to fetch blogs");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchBlogs();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
-  return {
-    loading,
-    blogs,
-    error,
-  };
+  return { loading, blogs, error };
 };
 
 
